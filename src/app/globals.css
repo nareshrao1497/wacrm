@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is([data-mode="dark"] *));
 
 @theme inline {
   --color-background: var(--background);
@@ -148,6 +148,19 @@ html[data-mode="light"] {
 /* ---- ACCENT: primary color ---- */
 
 :root,
+html[data-theme="wabotix"] {
+  --primary: oklch(0.65 0.22 150);
+  --primary-foreground: oklch(0.985 0 0);
+  --primary-hover: oklch(0.72 0.20 150);
+  --primary-soft: oklch(0.65 0.22 150 / 0.12);
+  --primary-soft-2: oklch(0.65 0.22 150 / 0.22);
+  --ring: oklch(0.65 0.22 150);
+  --chart-1: oklch(0.65 0.22 150);
+  --sidebar-primary: oklch(0.65 0.22 150);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-ring: oklch(0.65 0.22 150);
+}
+
 html[data-theme="violet"] {
   --primary: oklch(0.526 0.247 293);
   --primary-foreground: oklch(0.985 0 0);

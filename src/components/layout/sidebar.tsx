@@ -25,6 +25,7 @@ import {
   Workflow,
   X,
   Zap,
+  Megaphone,
 } from "lucide-react";
 import type { AccountRole } from "@/lib/auth/roles";
 
@@ -96,6 +97,7 @@ const navItems: NavItem[] = [
   { href: "/contacts", labelKey: "contacts", icon: Users },
   { href: "/pipelines", labelKey: "pipelines", icon: GitBranch },
   { href: "/broadcasts", labelKey: "broadcasts", icon: Radio },
+  { href: "/ads", labelKey: "ads", icon: Megaphone },
   { href: "/automations", labelKey: "automations", icon: Zap },
   { href: "/flows", labelKey: "flows", icon: Workflow, beta: true },
   { href: "/agents", labelKey: "aiAgents", icon: Bot },
@@ -186,14 +188,10 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
       >
         {/* Logo row. On mobile we put a close button here; on desktop the
             close button is hidden since the sidebar is always-visible. */}
-        <div className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-border px-4">
+        <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border px-4">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <MessageSquare className="h-4 w-4" />
-            </div>
-            <span className="text-sm font-semibold text-foreground">
-              {t("title")}
-            </span>
+            <img src="/logo.png" alt={t("title")} className="h-14 w-auto dark:hidden" />
+            <img src="/logo-dark.png" alt={t("title")} className="hidden h-14 w-auto dark:block" />
           </Link>
           <button
             type="button"

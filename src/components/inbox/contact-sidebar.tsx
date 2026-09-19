@@ -15,6 +15,7 @@ import {
   DollarSign,
   StickyNote,
   Plus,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -180,6 +181,39 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
 
           {/* Divider */}
           <div className="my-4 border-t border-border" />
+
+          {/* Ad Attribution */}
+          {contact.source === 'ad' && (
+            <>
+              <div>
+                <div className="flex items-center gap-2 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  <Megaphone className="h-3 w-3" />
+                  {tSidebar("adAttribution")}
+                </div>
+                <div className="mt-2 space-y-2 px-1">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground">Source</span>
+                    <span className="text-sm font-medium">Meta Ads (Click-to-WhatsApp)</span>
+                  </div>
+                  {contact.ad_title && (
+                    <div className="flex flex-col gap-1 mt-2">
+                      <span className="text-xs text-muted-foreground">Ad Title</span>
+                      <span className="text-sm font-medium">{contact.ad_title}</span>
+                    </div>
+                  )}
+                  {contact.ad_id && (
+                    <div className="flex flex-col gap-1 mt-2">
+                      <span className="text-xs text-muted-foreground">Ad ID</span>
+                      <span className="text-xs font-mono">{contact.ad_id}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Divider */}
+              <div className="my-4 border-t border-border" />
+            </>
+          )}
 
           {/* Tags */}
           <div>

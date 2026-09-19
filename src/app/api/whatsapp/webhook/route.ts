@@ -70,6 +70,15 @@ interface WhatsAppMessage {
   button?: { text?: string; payload?: string }
   /** Present when the customer swipe-replies to one of our messages. */
   context?: { id: string }
+  /** Present when the customer comes from a Click-to-WhatsApp Ad */
+  referral?: {
+    source_url?: string
+    source_type?: string
+    source_id?: string
+    headline?: string
+    body?: string
+    ad_title?: string
+  }
 }
 
 interface WhatsAppWebhookEntry {
@@ -590,13 +599,15 @@ async function processMessage(
 ) {
   const senderPhone = normalizePhone(message.from)
   const contactName = contact.profile.name
+  const referral = message.referral
 
   // Find or create contact
   const contactOutcome = await findOrCreateContact(
     accountId,
     configOwnerUserId,
     senderPhone,
-    contactName
+    contactName,
+    referral
   )
   if (!contactOutcome) return
   const contactRecord = contactOutcome.contact
@@ -605,7 +616,8 @@ async function processMessage(
   const convResult = await findOrCreateConversation(
     accountId,
     configOwnerUserId,
-    contactRecord.id
+    contactRecord.id,
+    referral
   )
   if (!convResult) return
   const conversation = convResult.conversation
@@ -1116,7 +1128,8 @@ async function findOrCreateContact(
   accountId: string,
   configOwnerUserId: string,
   phone: string,
-  name: string
+  name: string,
+  referral?: any
 ): Promise<ContactOutcome | null> {
   // Find an existing contact for this account by phone. The shared
   // helper pre-filters in SQL by the last-8-digit suffix (so we don't
@@ -1152,6 +1165,9 @@ async function findOrCreateContact(
       user_id: configOwnerUserId,
       phone,
       name: name || phone,
+      source: referral?.source_type || 'organic',
+      ad_id: referral?.source_id,
+      ad_title: referral?.headline || referral?.ad_title,
     })
     .select()
     .single()
@@ -1176,6 +1192,7 @@ async function findOrCreateConversation(
   accountId: string,
   configOwnerUserId: string,
   contactId: string,
+  referral?: any
 ) {
   // Look for an existing conversation in this account, oldest-first.
   //
@@ -1215,6 +1232,7 @@ async function findOrCreateConversation(
       account_id: accountId,
       user_id: configOwnerUserId,
       contact_id: contactId,
+      referral_data: referral || null,
     })
     .select()
     .single()

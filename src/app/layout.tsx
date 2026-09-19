@@ -22,10 +22,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "wacrm",
-    template: "%s — wacrm",
+    default: "Wabotix",
+    template: "%s — Wabotix",
   },
-  description: "Self-hostable CRM template for WhatsApp.",
+  description: "Wabotix - WhatsApp CRM",
   robots: {
     index: false,
     follow: false,
@@ -107,7 +107,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }}
         />
       </head>
-      <body className="min-h-full bg-background text-foreground font-sans">
+      <body suppressHydrationWarning className="min-h-full bg-background text-foreground font-sans">
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ThemeProvider>
             {children}

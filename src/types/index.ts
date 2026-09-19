@@ -107,6 +107,9 @@ export interface Contact {
   name?: string;
   email?: string;
   company?: string;
+  source?: string;
+  ad_id?: string;
+  ad_title?: string;
   avatar_url?: string;
   created_at: string;
   updated_at: string;
@@ -677,6 +680,21 @@ export interface QuickReply {
   content_text?: string | null;
   /** Set when `kind === 'interactive'`. */
   interactive_payload?: InteractiveMessagePayload | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdCampaign {
+  id: string;
+  account_id: string;
+  user_id: string;
+  meta_campaign_id?: string;
+  meta_adset_id?: string;
+  meta_ad_id?: string;
+  name: string;
+  status: string;
+  daily_budget?: number;
+  budget_currency?: string;
   created_at: string;
   updated_at: string;
 }

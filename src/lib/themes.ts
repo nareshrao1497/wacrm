@@ -14,6 +14,7 @@
  */
 
 export const THEME_IDS = [
+  "wabotix",
   "violet",
   "emerald",
   "cobalt",
@@ -23,7 +24,7 @@ export const THEME_IDS = [
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
-export const DEFAULT_THEME: ThemeId = "violet";
+export const DEFAULT_THEME: ThemeId = "wabotix";
 
 export const STORAGE_KEY = "wacrm.theme";
 
@@ -67,6 +68,12 @@ export interface ThemeMeta {
 }
 
 export const THEMES: ReadonlyArray<ThemeMeta> = [
+  {
+    id: "wabotix",
+    name: "Wabotix",
+    tagline: "The default Wabotix vibrant green.",
+    swatch: "oklch(0.65 0.22 150)",
+  },
   {
     id: "violet",
     name: "Violet",

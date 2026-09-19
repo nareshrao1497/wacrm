@@ -39,6 +39,7 @@ import {
   X,
   DollarSign,
   LayoutTemplate,
+  Megaphone,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -521,6 +522,34 @@ export function ContactDetailView({
                       className="bg-muted border-border text-foreground h-8 text-sm"
                     />
                   </div>
+
+                  {contact.source === 'ad' && (
+                    <div className="mt-6 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        <Megaphone className="size-3" />
+                        Ad Attribution
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-xs text-muted-foreground">Source</span>
+                          <span className="text-sm font-medium">Meta Ads (Click-to-WhatsApp)</span>
+                        </div>
+                        {contact.ad_title && (
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs text-muted-foreground">Ad Title</span>
+                            <span className="text-sm font-medium">{contact.ad_title}</span>
+                          </div>
+                        )}
+                        {contact.ad_id && (
+                          <div className="flex flex-col gap-1">
+                            <span className="text-xs text-muted-foreground">Ad ID</span>
+                            <span className="text-xs font-mono">{contact.ad_id}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   <Button
                     onClick={saveDetails}
                     disabled={savingDetails}

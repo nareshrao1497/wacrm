@@ -31,6 +31,19 @@ async function resolveAccountId(
   return data.account_id as string
 }
 
+function getEnv(name: string, ...fallbacks: string[]): string | undefined {
+  const g = globalThis as any;
+  const envObj = (process.env || {}) as Record<string, string | undefined>;
+  const candidates = [name, ...fallbacks];
+  for (const k of candidates) {
+    if (envObj[k]) return envObj[k];
+    if (g[k]) return g[k];
+    if (g?.env?.[k]) return g?.env?.[k];
+    if (g?.__env?.[k]) return g?.__env?.[k];
+  }
+  return undefined;
+}
+
 // Lazy-initialised service-role client. We need it to detect a
 // phone_number_id already claimed by a *different* user — under RLS,
 // the user's own session can't see other users' rows, so the conflict
@@ -39,16 +52,19 @@ async function resolveAccountId(
 let _adminClient: any = null
 function supabaseAdmin() {
   if (!_adminClient) {
-    const env = process.env as Record<string, string | undefined>
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || env.NEXT_PUBLIC_SUPAB
-    const serviceRoleKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      env.SUPABASE_SERVICE_ ||
-      env.SUPABASE_SERVICE_ROLE
+    const url = getEnv('NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPAB')
+    const serviceRoleKey = getEnv(
+      'SUPABASE_SERVICE_ROLE_KEY',
+      'SUPABASE_SERVICE_',
+      'SUPABASE_SERVICE_ROLE'
+    )
     if (!url || !serviceRoleKey) {
+      const g = globalThis as any;
+      const pKeys = Object.keys(process.env || {}).filter(k => !k.startsWith('npm_') && !k.startsWith('_'));
+      const gKeys = Object.keys(g?.env || {});
       throw new Error(
         !serviceRoleKey
-          ? 'SUPABASE_SERVICE_ROLE_KEY is not set in environment variables on the server.'
+          ? `SUPABASE_SERVICE_ROLE_KEY is not set. Found process.env keys: [${pKeys.join(', ')}], globalThis.env keys: [${gKeys.join(', ')}]`
           : 'NEXT_PUBLIC_SUPABASE_URL is not set in environment variables on the server.'
       )
     }

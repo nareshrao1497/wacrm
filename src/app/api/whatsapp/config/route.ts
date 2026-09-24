@@ -39,10 +39,16 @@ async function resolveAccountId(
 let _adminClient: any = null
 function supabaseAdmin() {
   if (!_adminClient) {
-    _adminClient = createAdminClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!url || !serviceRoleKey) {
+      throw new Error(
+        !serviceRoleKey
+          ? 'SUPABASE_SERVICE_ROLE_KEY is not set in environment variables on the server.'
+          : 'NEXT_PUBLIC_SUPABASE_URL is not set in environment variables on the server.'
+      )
+    }
+    _adminClient = createAdminClient(url, serviceRoleKey)
   }
   return _adminClient
 }
@@ -149,9 +155,10 @@ export async function GET() {
       )
     }
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error'
     console.error('Error in WhatsApp config GET:', error)
     return NextResponse.json(
-      { connected: false, reason: 'unknown', message: 'Internal server error' },
+      { connected: false, reason: 'unknown', message },
       { status: 500 }
     )
   }
@@ -426,8 +433,9 @@ export async function POST(request: Request) {
       phone_info: phoneInfo,
     })
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error'
     console.error('Error in WhatsApp config POST:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 
@@ -474,7 +482,8 @@ export async function DELETE() {
 
     return NextResponse.json({ success: true })
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Internal server error'
     console.error('Error in WhatsApp config DELETE:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

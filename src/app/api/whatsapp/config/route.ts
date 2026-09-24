@@ -39,8 +39,12 @@ async function resolveAccountId(
 let _adminClient: any = null
 function supabaseAdmin() {
   if (!_adminClient) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const env = process.env as Record<string, string | undefined>
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || env.NEXT_PUBLIC_SUPAB
+    const serviceRoleKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      env.SUPABASE_SERVICE_ ||
+      env.SUPABASE_SERVICE_ROLE
     if (!url || !serviceRoleKey) {
       throw new Error(
         !serviceRoleKey

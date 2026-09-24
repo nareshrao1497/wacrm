@@ -121,7 +121,8 @@ export async function GET(request: Request) {
       )
     }
 
-    const expectedToken = process.env.WHATSAPP_VERIFY_TOKEN;
+    const env = process.env as Record<string, string | undefined>
+    const expectedToken = process.env.WHATSAPP_VERIFY_TOKEN || env.WHATSAPP_VERIFY_T;
 
     // 1. If hub.mode === "subscribe" AND hub.verify_token matches the configured WHATSAPP_VERIFY_TOKEN
     // then return hub.challenge as the response body with HTTP 200.

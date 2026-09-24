@@ -29,8 +29,30 @@ import crypto from 'crypto'
 function getEncryptionKey(): string {
   const g = globalThis as any;
   const env = (process.env || {}) as Record<string, string | undefined>;
+  let cfEnv: any = null;
+  if (g.env && typeof g.env === 'object') {
+    cfEnv = g.env;
+  } else {
+    const symbols = Object.getOwnPropertySymbols(g);
+    for (const sym of symbols) {
+      try {
+        const val = g[sym];
+        const store = typeof val?.getStore === 'function' ? val.getStore() : val;
+        if (store?.env && typeof store.env === 'object') {
+          cfEnv = store.env;
+          break;
+        }
+        if (store && (store.ENCRYPTION_KEY || store.SUPABASE_SERVICE_ROLE_KEY)) {
+          cfEnv = store;
+          break;
+        }
+      } catch {}
+    }
+  }
+
   const key =
     env.ENCRYPTION_KEY ||
+    cfEnv?.ENCRYPTION_KEY ||
     g?.ENCRYPTION_KEY ||
     g?.env?.ENCRYPTION_KEY ||
     g?.__env?.ENCRYPTION_KEY;

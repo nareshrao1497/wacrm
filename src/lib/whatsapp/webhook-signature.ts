@@ -18,11 +18,13 @@ import crypto from 'node:crypto'
  *   unsafe for a public template: anyone who forgets the env var would
  *   be running a fully spoofable webhook.
  */
+import { getServerEnv } from '@/lib/server-env'
+
 export function verifyMetaWebhookSignature(
   rawBody: string,
   signatureHeader: string | null,
 ): boolean {
-  const secret = process.env.META_APP_SECRET
+  const secret = getServerEnv('META_APP_SECRET')
   if (!secret) {
     console.error(
       '[webhook] META_APP_SECRET is not set — rejecting request. ' +

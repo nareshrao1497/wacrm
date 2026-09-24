@@ -22,14 +22,16 @@ import {
 // plan's ceiling). Tune as needed.
 export const maxDuration = 60
 
+import { getServerEnv } from '@/lib/server-env'
+
 // Lazy-initialized to avoid build-time crash when env vars are missing
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _adminClient: any = null
 function supabaseAdmin() {
   if (!_adminClient) {
     _adminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      getServerEnv('NEXT_PUBLIC_SUPABASE_URL'),
+      getServerEnv('SUPABASE_SERVICE_ROLE_KEY')
     )
   }
   return _adminClient
@@ -121,8 +123,7 @@ export async function GET(request: Request) {
       )
     }
 
-    const env = process.env as Record<string, string | undefined>
-    const expectedToken = process.env.WHATSAPP_VERIFY_TOKEN || env.WHATSAPP_VERIFY_T;
+    const expectedToken = getServerEnv('WHATSAPP_VERIFY_TOKEN');
 
     // 1. If hub.mode === "subscribe" AND hub.verify_token matches the configured WHATSAPP_VERIFY_TOKEN
     // then return hub.challenge as the response body with HTTP 200.

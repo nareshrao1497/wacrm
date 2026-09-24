@@ -31,45 +31,7 @@ async function resolveAccountId(
   return data.account_id as string
 }
 
-function getCloudflareEnv(): Record<string, any> | null {
-  const g = globalThis as any;
-  if (g.env && typeof g.env === 'object') return g.env;
-
-  const symbols = Object.getOwnPropertySymbols(g);
-  for (const sym of symbols) {
-    try {
-      const val = g[sym];
-      if (!val) continue;
-      const store = typeof val.getStore === 'function' ? val.getStore() : val;
-      if (store?.env && typeof store.env === 'object') {
-        return store.env;
-      }
-      if (
-        store &&
-        typeof store === 'object' &&
-        (store.SUPABASE_SERVICE_ROLE_KEY || store.SUPABASE_SERVICE_ || store.ENCRYPTION_KEY)
-      ) {
-        return store;
-      }
-    } catch {}
-  }
-  return null;
-}
-
-function getEnv(name: string, ...fallbacks: string[]): string | undefined {
-  const g = globalThis as any;
-  const envObj = (process.env || {}) as Record<string, string | undefined>;
-  const cfEnv = getCloudflareEnv() || {};
-  const candidates = [name, ...fallbacks];
-  for (const k of candidates) {
-    if (envObj[k]) return envObj[k];
-    if (cfEnv[k]) return cfEnv[k];
-    if (g[k]) return g[k];
-    if (g?.env?.[k]) return g?.env?.[k];
-    if (g?.__env?.[k]) return g?.__env?.[k];
-  }
-  return undefined;
-}
+import { getServerEnv } from '@/lib/server-env';
 
 // Lazy-initialised service-role client. We need it to detect a
 // phone_number_id already claimed by a *different* user — under RLS,
@@ -79,27 +41,18 @@ function getEnv(name: string, ...fallbacks: string[]): string | undefined {
 let _adminClient: any = null
 function supabaseAdmin() {
   if (!_adminClient) {
-    const url = getEnv('NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPAB')
-    const serviceRoleKey = getEnv(
-      'SUPABASE_SERVICE_ROLE_KEY',
-      'SUPABASE_SERVICE_',
-      'SUPABASE_SERVICE_ROLE'
-    )
+    const url = getServerEnv('NEXT_PUBLIC_SUPABASE_URL');
+    const serviceRoleKey = getServerEnv('SUPABASE_SERVICE_ROLE_KEY');
     if (!url || !serviceRoleKey) {
-      const g = globalThis as any;
-      const pKeys = Object.keys(process.env || {}).filter(k => !k.startsWith('npm_') && !k.startsWith('_'));
-      const cfEnv = getCloudflareEnv();
-      const cfKeys = cfEnv ? Object.keys(cfEnv) : [];
-      const gSymbols = Object.getOwnPropertySymbols(g).map(s => s.toString());
       throw new Error(
         !serviceRoleKey
-          ? `SUPABASE_SERVICE_ROLE_KEY is not set. process.env: [${pKeys.join(', ')}], cfEnv: [${cfKeys.join(', ')}], symbols: [${gSymbols.join(', ')}]`
-          : 'NEXT_PUBLIC_SUPABASE_URL is not set in environment variables on the server.'
-      )
+          ? 'SUPABASE_SERVICE_ROLE_KEY is not set.'
+          : 'NEXT_PUBLIC_SUPABASE_URL is not set.'
+      );
     }
-    _adminClient = createAdminClient(url, serviceRoleKey)
+    _adminClient = createAdminClient(url, serviceRoleKey);
   }
-  return _adminClient
+  return _adminClient;
 }
 
 /**

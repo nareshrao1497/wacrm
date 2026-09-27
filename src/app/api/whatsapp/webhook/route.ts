@@ -1186,16 +1186,36 @@ async function findOrCreateConversation(
 
   // Create new conversation. Same tenancy + audit split as
   // findOrCreateContact above.
-  const { data: newConv, error: createError } = await supabaseAdmin()
+  const convPayload: Record<string, unknown> = {
+    account_id: accountId,
+    user_id: configOwnerUserId,
+    contact_id: contactId,
+  }
+  if (referral) {
+    convPayload.referral_data = referral
+  }
+
+  let { data: newConv, error: createError } = await supabaseAdmin()
     .from('conversations')
-    .insert({
-      account_id: accountId,
-      user_id: configOwnerUserId,
-      contact_id: contactId,
-      referral_data: referral || null,
-    })
+    .insert(convPayload)
     .select()
     .single()
+
+  // Fallback: If referral_data column is missing in schema cache (migration 041 not yet applied), retry without it
+  if (createError && (createError.code === 'PGRST204' || createError.message?.includes('referral_data'))) {
+    console.warn('[webhook] conversations.referral_data column missing; retrying without it')
+    const fallbackRes = await supabaseAdmin()
+      .from('conversations')
+      .insert({
+        account_id: accountId,
+        user_id: configOwnerUserId,
+        contact_id: contactId,
+      })
+      .select()
+      .single()
+    newConv = fallbackRes.data
+    createError = fallbackRes.error
+  }
 
   if (createError) {
     // Lost a race: a concurrent inbound delivery created the

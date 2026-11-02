@@ -60,7 +60,7 @@ export function getServerEnv(name: string, fallbackDefault?: string): string {
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRzbXdocHRqbGhhZ2FncXFvZHVsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODYyNzM0NSwiZXhwIjoyMTA0MjAzMzQ1fQ.dG_a29Z5lK487jrh5aPL4TUWI6sx4L0zd5Bec7iAgtk',
     ENCRYPTION_KEY:
       'e37cc9b6bf9409d0d7ed219d4226a48a77a57d835ca469db60d5c298131ad5b1',
-    META_APP_SECRET: 'a46cf50f4eed8090a71a269ac0a15e7d',
+    META_APP_SECRET: '81a2c130a4cc41f127bbc87185b6f358',
     WHATSAPP_VERIFY_TOKEN: 'Bizz_Enablers_2025',
   };
 
